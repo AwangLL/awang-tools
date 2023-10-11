@@ -1,0 +1,1 @@
+import{o as n,c as s}from"./index-bd2bca93.js";const r=(e,t)=>{const o=e.__vccOpts||e;for(const[c,_]of t)o[c]=_;return o},a={},d={class:"container"};function f(e,t){return n(),s("div",d)}const p=r(a,[["render",f],["__scopeId","data-v-f6425be3"]]);export{p as default};
