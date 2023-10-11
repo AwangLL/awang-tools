@@ -1,14 +1,47 @@
-import './assets/main.css'
+import { createApp, toRaw } from "vue";
+import { createPinia, type PiniaPluginContext } from "pinia";
 
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
+import App from "./App.vue";
+import router from "./router";
 
-import App from './App.vue'
-import router from './router'
+const app = createApp(App);
 
-const app = createApp(App)
+// global css
+import "@/assets/reset.css";
+import "@/assets/base.css";
 
-app.use(createPinia())
-app.use(router)
+// pinia
+const __piniaKey = '__PINIAKEY__'
 
-app.mount('#app')
+type Options = {
+  key?: string
+}
+
+const setStorage = (key: string, value: any): void => {
+  localStorage.setItem(key, JSON.stringify(value))
+}
+const getStorage = (key: string) => {
+  return (localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key) as string) : {})
+}
+const piniaPlugin = (options: Options) => {
+  return (context: PiniaPluginContext) => {
+    const { store } = context;
+    const data = getStorage(`${options?.key ?? __piniaKey}-${store.$id}`)
+    store.$subscribe(() => {
+      setStorage(`${options?.key ?? __piniaKey}-${store.$id}`, toRaw(store.$state));
+    })
+    return {
+      ...data
+    }
+  }
+}
+
+const store = createPinia()
+store.use(piniaPlugin({
+  key: 'pinia'
+}))
+
+app.use(store);
+app.use(router);
+
+app.mount("#app");
